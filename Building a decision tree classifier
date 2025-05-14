@@ -1,0 +1,41 @@
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+import matplotlib.pyplot as plt
+
+# Load dataset
+df = pd.read_csv('bank-full.csv', sep=';')  # Update path if needed
+print("First 5 Rows:")
+print(df.head())
+
+# Encode categorical features using get_dummies
+df_encoded = pd.get_dummies(df, drop_first=True)
+
+# Split data
+X = df_encoded.drop('y_yes', axis=1)  # Target is 'y', binary encoded as 'y_yes'
+y = df_encoded['y_yes']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Build and train Decision Tree
+clf = DecisionTreeClassifier(max_depth=5, random_state=42)
+clf.fit(X_train, y_train)
+
+# Predictions
+y_pred = clf.predict(X_test)
+
+# Evaluation
+print("\nAccuracy Score:", accuracy_score(y_test, y_pred))
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+# Plot the tree
+plt.figure(figsize=(20,10))
+plot_tree(clf, feature_names=X.columns, class_names=['No', 'Yes'], filled=True)
+plt.title("Decision Tree for Customer Purchase Prediction")
+plt.show()
